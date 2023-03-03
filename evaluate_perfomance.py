@@ -10,8 +10,11 @@ def main(args):
     predict_dataset = load_dataset("lexlms/lex_glue_v2", args.dataset_name, split="test",
                                    use_auth_token='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')
 
-    label_names = [f'{label_name}'.lower() for idx, label_name in enumerate(predict_dataset.features['labels'].feature.names)]
-    label_names.append(f'None'.lower())
+    if args.multi_label:
+        label_names = [f'{label_name}'.lower() for idx, label_name in enumerate(predict_dataset.features['labels'].feature.names)]
+        label_names.append(f'None'.lower())
+    else:
+        label_names = [f'{label_name}'.lower() for idx, label_name in enumerate(predict_dataset.features['label'].names)]
 
     dataset = []
     with open(os.path.join(DATA_DIR, f'{args.dataset_name}_{args.model_name}_predictions.jsonl'), 'w') as file:
@@ -38,6 +41,8 @@ def main(args):
 parser = argparse.ArgumentParser(description='Prompting GPT')
 parser.add_argument("--dataset_name", type=str, default='unfair_tos', help="Name of dataset as stored on HF")
 parser.add_argument("--model_name", type=str, default='gpt-3.5-turbo', help="GPT model name")
+parser.add_argument("--multi_label", type=bool, default='gpt-3.5-turbo', help="GPT model name")
+
 args = parser.parse_args()
 
 main(args)
