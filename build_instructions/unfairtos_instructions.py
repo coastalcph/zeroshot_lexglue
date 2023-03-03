@@ -15,7 +15,7 @@ with open(os.path.join(DATA_DIR, 'unfair_tos.jsonl'), 'w') as file:
     for idx, sample in enumerate(predict_dataset):
         text = sample["text"].replace(' ,', ',').replace(' .', '.').replace('\n', ' ').replace('`` ', '\'').replace(' \'\'', '\'').strip()
         text_input = f'Given the following sentence from an online Term of Services: "{text}"\n'
-        text_input += 'Is this sentence unfair with respect to any of the following options:\n'
+        text_input += 'The sentence is unfair with respect to some of the following options:\n'
         for end_idx, label_name in enumerate(label_names):
             text_input += f'- {label_name}\n'
         text_input += f'- None\n'

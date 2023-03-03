@@ -16,10 +16,10 @@ with open(os.path.join(DATA_DIR, 'ledgar.jsonl'), 'w') as file:
     for idx, sample in enumerate(predict_dataset):
         text = sample["text"].replace(' ,', ',').replace(' .', '.').replace('\n', ' ').replace('`` ', '\'').replace(' \'\'', '\'').strip()
         text_input = f'Given the following contractual section:\n"{text}"\n'
-        text_input += 'What is the most appropriate section title out of the following options:\n'
+        text_input += 'There is an appropriate section title out of the following options:\n'
         for end_idx, label_name in enumerate(label_names):
             text_input += f'- {label_name}\n'
-        text_input += 'The most appropriate options is:'
+        text_input += 'The most appropriate option is:'
         print(text_input)
         answer = label_names[sample['label']]
         file.write(json.dumps({'input_text': text_input, 'answer': answer}) + '\n')

@@ -43,7 +43,7 @@ with open(os.path.join(DATA_DIR, 'eurlex.jsonl'), 'w') as file:
         text = sample["text"]
         shortened_text = ' '.join(text.split(' ')[:512])
         text_input = f'Given the following excerpt from an EU law:\n"{text}"\n'
-        text_input += 'Which topics are relevant out of the following options:\n'
+        text_input += 'The EU law is relevant to some topics out of the following options:\n'
         for end_idx, label_name in enumerate(label_names):
             text_input += f'- {label_name}\n'
         text_input += 'The relevant options are:'
