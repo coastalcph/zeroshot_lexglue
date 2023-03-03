@@ -4,7 +4,8 @@ from data import DATA_DIR
 from datasets import load_dataset
 import random
 
-predict_dataset = load_dataset("lex_glue", 'case_hold', split="test")
+predict_dataset = load_dataset("lexlms/lex_glue_v2", 'case_hold', split="test",
+                               use_auth_token='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')
 random.seed(42)
 random_ids = random.sample(range(len(predict_dataset)), k=1000)
 predict_dataset = predict_dataset.select(random_ids)

@@ -3,7 +3,9 @@ import os
 from data import DATA_DIR
 from datasets import load_dataset
 import random
-predict_dataset = load_dataset("lex_glue", 'unfair_tos', split="test")
+
+predict_dataset = load_dataset("lexlms/lex_glue_v2", 'unfair_tos', split="test",
+                               use_auth_token='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')
 label_names = predict_dataset.features['labels'].feature.names
 random.seed(42)
 random_ids = random.sample(range(len(predict_dataset)), k=1000)

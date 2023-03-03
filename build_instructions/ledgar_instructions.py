@@ -5,7 +5,8 @@ from data import DATA_DIR
 from datasets import load_dataset
 
 
-predict_dataset = load_dataset("lex_glue", 'ledgar', split="test")
+predict_dataset = load_dataset("lexlms/lex_glue_v2", 'ledgar', split="test",
+                               use_auth_token='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')
 label_names = predict_dataset.features['label'].names
 random.seed(42)
 random_ids = random.sample(range(len(predict_dataset)), k=1000)

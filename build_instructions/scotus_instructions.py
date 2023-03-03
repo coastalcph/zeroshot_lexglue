@@ -4,7 +4,8 @@ from data import DATA_DIR
 from datasets import load_dataset
 import random
 
-predict_dataset = load_dataset("lex_glue", 'scotus', split="test")
+predict_dataset = load_dataset("lexlms/lex_glue_v2", 'scotus', split="test",
+                               use_auth_token='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')
 label_names = ['Criminal Procedure', 'Civil Rights', 'First Amendment', 'Due Process', 'Privacy', 'Attorneys', 
                 'Unions', 'Economic Activity', 'Judicial Power', 'Federalism', 'Interstate Relations',
                 'Federal Taxation', 'Miscellaneous']

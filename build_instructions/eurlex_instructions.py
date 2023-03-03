@@ -4,7 +4,7 @@ from data import DATA_DIR
 from datasets import load_dataset
 import random
 
-predict_dataset = load_dataset("lex_glue", 'eurlex', split="test",
+predict_dataset = load_dataset("lexlms/lex_glue_v2", 'eurlex', split="test",
                                use_auth_token='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')
 label_names = predict_dataset.features['labels'].feature.names
 label_names = ['political framework', 'politics and public safety', 'executive power and public service',
