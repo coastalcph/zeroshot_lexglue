@@ -21,8 +21,6 @@ predictions = np.zeros((len(dataset), len(label_names)))
 nones = 0
 for idx, example in enumerate(dataset):
     if example['prediction'] is not None:
-        if ',' in example['prediction']:
-            print()
         for l_idx, label_name in enumerate(label_names):
             if label_name in dataset[idx]['answer'].lower():
                 labels[idx][l_idx] = 1

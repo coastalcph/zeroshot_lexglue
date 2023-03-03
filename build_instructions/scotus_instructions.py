@@ -2,12 +2,16 @@ import json
 import os
 from data import DATA_DIR
 from datasets import load_dataset
+import random
 
 predict_dataset = load_dataset("lex_glue", 'scotus', split="test")
-# label_names = predict_dataset.features['label'].names
 label_names = ['Criminal Procedure', 'Civil Rights', 'First Amendment', 'Due Process', 'Privacy', 'Attorneys', 
                 'Unions', 'Economic Activity', 'Judicial Power', 'Federalism', 'Interstate Relations',
                 'Federal Taxation', 'Miscellaneous']
+random.seed(42)
+random_ids = random.sample(range(len(predict_dataset)), k=1000)
+predict_dataset = predict_dataset.select(random_ids)
+
 with open(os.path.join(DATA_DIR, 'scotus.jsonl'), 'w') as file:
     for idx, sample in enumerate(predict_dataset):
         text = sample["text"]

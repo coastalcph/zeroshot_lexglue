@@ -16,27 +16,28 @@ def main(args):
             dataset.append(json.loads(line))
 
     for idx, example in tqdm.tqdm(enumerate(dataset)):
-        try:
-            response = openai.ChatCompletion.create(
-              model=args.model_name,
-              messages=[
-                    {"role": "user", "content": example['input_text']},
-                ]
-            )
-            dataset[idx]['prediction'] = response['choices'][0]['message']['content']
-        except:
-            dataset[idx]['prediction'] = None
+        if args.model_name == 'gpt-3.5-turbo':
+            try:
+                response = openai.ChatCompletion.create(
+                  model=args.model_name,
+                  messages=[
+                        {"role": "user", "content": example['input_text']},
+                    ]
+                )
+                dataset[idx]['prediction'] = response['choices'][0]['message']['content']
+            except:
+                dataset[idx]['prediction'] = None
+        else:
+            try:
+                response = openai.Completion.create(
+                  model="gpt-3.5",
+                  prompt=example['input_text'] + " The answer is: "
+                )
+                dataset[idx]['prediction'] = response['choices'][0]['message']['content']
+            except:
+                dataset[idx]['prediction'] = None
 
-        # try:
-        #     response = openai.Completion.create(
-        #       model="gpt-3.5-turbo",
-        #       prompt=example['input_text'] + " The answer is: "
-        #     )
-        #     dataset[idx]['prediction'] = response['choices'][0]['message']['content']
-        # except:
-        #     dataset[idx]['prediction'] = None
-
-    with open(os.path.join(DATA_DIR, f'{args.dataset_name}_predictions.jsonl'), 'w') as file:
+    with open(os.path.join(DATA_DIR, f'{args.dataset_name}_{args.model_name}_predictions.jsonl'), 'w') as file:
         for example in dataset:
             file.write(json.dumps(example) + '\n')
 

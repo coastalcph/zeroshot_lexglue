@@ -2,8 +2,12 @@ import json
 import os
 from data import DATA_DIR
 from datasets import load_dataset
+import random
 
 predict_dataset = load_dataset("lex_glue", 'case_hold', split="test")
+random.seed(42)
+random_ids = random.sample(range(len(predict_dataset)), k=1000)
+predict_dataset = predict_dataset.select(random_ids)
 
 with open(os.path.join(DATA_DIR, 'case_hold.jsonl'), 'w') as file:
     for idx, sample in enumerate(predict_dataset):
