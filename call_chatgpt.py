@@ -43,7 +43,7 @@ def main(args):
 
 
 parser = argparse.ArgumentParser(description='Prompting GPT')
-parser.add_argument("--dataset_name", type=str, default='unfair_tos', help="Name of dataset as stored on HF")
+parser.add_argument("--dataset_name", type=str, default='ledgar', help="Name of dataset as stored on HF")
 parser.add_argument("--model_name", type=str, default='gpt-3.5-turbo', help="GPT model name")
 args = parser.parse_args()
 
