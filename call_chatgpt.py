@@ -4,11 +4,13 @@ import os.path
 import openai
 import tqdm
 import argparse
-from data import DATA_DIR, OPENAI_KEY
-openai.api_key = OPENAI_KEY
+from data import DATA_DIR
 
 
 def main(args):
+    # Provide OpenAI API key
+    api_key = input("Please provide an OpenAI API key:\n")
+    openai.api_key = api_key
 
     dataset = []
     with open(os.path.join(DATA_DIR, f'{args.dataset_name}.jsonl')) as in_file:
