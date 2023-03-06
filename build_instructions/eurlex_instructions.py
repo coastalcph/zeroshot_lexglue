@@ -3,6 +3,7 @@ import os
 from data import DATA_DIR
 from datasets import load_dataset
 import random
+import tiktoken
 
 predict_dataset = load_dataset("lexlms/lex_glue_v2", 'eurlex', split="test",
                                use_auth_token='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')
@@ -38,10 +39,24 @@ random.seed(42)
 random_ids = random.sample(range(len(predict_dataset)), k=1000)
 predict_dataset = predict_dataset.select(random_ids)
 
+templated_text = 'Given the following excerpt from an EU law:\n" "\n'
+templated_text += 'The EU law is relevant to some topics out of the following options:\n'
+for end_idx, label_name in enumerate(label_names):
+    templated_text += f'- {label_name}\n'
+templated_text += 'The relevant options are:'
+
+tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
+templated_text_length = len(tokenizer.encode(templated_text))
+
 with open(os.path.join(DATA_DIR, 'eurlex.jsonl'), 'w') as file:
     for idx, sample in enumerate(predict_dataset):
         text = sample["text"]
-        shortened_text = ' '.join(text.split(' ')[:512])
+        words = text.split(' ')
+        for threshold in [512, 450, 400]:
+            shortened_text = ' '.join(text.split(' ')[:threshold])
+            input_text_length = len(tokenizer.encode(shortened_text))
+            if templated_text_length + input_text_length <= 4000:
+                break
         text_input = f'Given the following excerpt from an EU law:\n"{text}"\n'
         text_input += 'The EU law is relevant to some topics out of the following options:\n'
         for end_idx, label_name in enumerate(label_names):
