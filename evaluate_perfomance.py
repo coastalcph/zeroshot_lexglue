@@ -35,7 +35,7 @@ def main(args):
             nones += 1
 
     print(f'{nones} question unanswered!\n')
-    print(classification_report(y_true=labels, y_pred=predictions, target_names=label_names, zero_division=0))
+    print(classification_report(y_true=labels, y_pred=predictions, target_names=label_names, zero_division=0, digits=3))
 
 
 parser = argparse.ArgumentParser(description='Prompting GPT')

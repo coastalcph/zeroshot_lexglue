@@ -12,16 +12,21 @@ random.seed(42)
 random_ids = random.sample(range(len(predict_dataset)), k=1000)
 predict_dataset = predict_dataset.select(random_ids)
 
+# Prompt templated text
+INPUT_INTRODUCTORY_TEXT = f'Given the following contractual section:'
+OPTIONS_PRESENTATION_TEXT = 'There is an appropriate section title out of the following options:\n'
+QUESTION_TEXT = 'The most appropriate option is:'
+
 with open(os.path.join(DATA_DIR, 'ledgar.jsonl'), 'w') as file:
     for idx, sample in enumerate(predict_dataset):
         text = sample["text"].replace(' ,', ',').replace(' .', '.').replace('\n', ' ').replace('`` ', '\'').replace(' \'\'', '\'').strip()
-        text_input = f'Given the following contractual section:\n"{text}"\n'
-        text_input += 'There is an appropriate section title out of the following options:\n'
+        text_input = INPUT_INTRODUCTORY_TEXT + f'\n"{text}"\n\n'
+        text_input += OPTIONS_PRESENTATION_TEXT
         for end_idx, label_name in enumerate(label_names):
             text_input += f'- {label_name}\n'
-        text_input += 'The most appropriate option is:'
+        text_input += QUESTION_TEXT
         print(text_input)
         answer = label_names[sample['label']]
         file.write(json.dumps({'input_text': text_input, 'answer': answer}) + '\n')
-        print(f'The best option is: {answer}')
+        print(f'{QUESTION_TEXT} {answer}')
         print('-'*100)

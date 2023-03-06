@@ -39,11 +39,16 @@ random.seed(42)
 random_ids = random.sample(range(len(predict_dataset)), k=1000)
 predict_dataset = predict_dataset.select(random_ids)
 
-templated_text = 'Given the following excerpt from an EU law:\n" "\n'
-templated_text += 'The EU law is relevant to some topics out of the following options:\n'
+# Prompt templated text
+INPUT_INTRODUCTORY_TEXT = f'Given the following excerpt from an EU law:'
+OPTIONS_PRESENTATION_TEXT = 'The EU law is relevant to some topics out of the following options:\n'
+QUESTION_TEXT = 'The relevant options are:'
+
+templated_text = INPUT_INTRODUCTORY_TEXT + '\n" "\n'
+templated_text += OPTIONS_PRESENTATION_TEXT
 for end_idx, label_name in enumerate(label_names):
     templated_text += f'- {label_name}\n'
-templated_text += 'The relevant options are:'
+templated_text += QUESTION_TEXT
 
 tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
 templated_text_length = len(tokenizer.encode(templated_text))
@@ -57,13 +62,13 @@ with open(os.path.join(DATA_DIR, 'eurlex.jsonl'), 'w') as file:
             input_text_length = len(tokenizer.encode(shortened_text))
             if templated_text_length + input_text_length <= 4000:
                 break
-        text_input = f'Given the following excerpt from an EU law:\n"{text}"\n'
-        text_input += 'The EU law is relevant to some topics out of the following options:\n'
+        text_input = INPUT_INTRODUCTORY_TEXT + f'\n"{text}"\n\n'
+        text_input += OPTIONS_PRESENTATION_TEXT
         for end_idx, label_name in enumerate(label_names):
             text_input += f'- {label_name}\n'
-        text_input += 'The relevant options are:'
+        text_input += QUESTION_TEXT
         print(text_input)
         answer = ", ".join([label_names[label] for idx, label in sorted(enumerate(sample['labels']))])
         file.write(json.dumps({'input_text': text_input, 'answer': answer}) + '\n')
-        print(f'The right options are: {answer}')
+        print(f'{QUESTION_TEXT} {answer}')
         print('-' * 100)

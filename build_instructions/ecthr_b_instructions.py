@@ -12,13 +12,17 @@ random.seed(42)
 random_ids = random.sample(range(len(predict_dataset)), k=1000)
 predict_dataset = predict_dataset.select(random_ids)
 
-# Templated text
-templated_text = 'Given the following facts from a European Court of Human Rights (ECtHR) case:\n" "\n'
-templated_text += 'Which article(s) of ECHR are relevant, if any, out of the following options:\n'
+# Prompt templated text
+INPUT_INTRODUCTORY_TEXT = f'Given the following facts from a European Court of Human Rights (ECtHR) case:'
+OPTIONS_PRESENTATION_TEXT = 'Which article(s) of ECHR are relevant, if any, out of the following options:\n'
+QUESTION_TEXT = 'The relevant options are:'
+
+templated_text = INPUT_INTRODUCTORY_TEXT + '\n" "\n'
+templated_text += OPTIONS_PRESENTATION_TEXT
 for end_idx, label_name in enumerate(label_names):
     templated_text += f'- {label_name}\n'
-templated_text += f'- None\n'
-templated_text += 'The relevant options are:'
+templated_text += QUESTION_TEXT
+
 
 tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
 templated_text_length = len(tokenizer.encode(templated_text))
@@ -32,8 +36,8 @@ with open(os.path.join(DATA_DIR, 'ecthr_b.jsonl'), 'w') as file:
             input_text_length = len(tokenizer.encode(shortened_text))
             if templated_text_length + input_text_length <= 4000:
                 break
-        text_input = f'Given the following facts from a European Court of Human Rights (ECtHR) case:\n"{shortened_text}"\n\n'
-        text_input += 'Which article(s) of ECHR are relevant, if any, out of the following options:\n'
+        text_input = INPUT_INTRODUCTORY_TEXT + f'\n"{shortened_text}"\n\n'
+        text_input += OPTIONS_PRESENTATION_TEXT
         for end_idx, label_name in enumerate(label_names):
             text_input += f'- Article {label_name}\n'
         text_input += f'- None\n'
@@ -44,5 +48,5 @@ with open(os.path.join(DATA_DIR, 'ecthr_b.jsonl'), 'w') as file:
         else:
             answer = f'None'
         file.write(json.dumps({'input_text': text_input, 'answer': answer}) + '\n')
-        print(f'The relevant options are: {answer}')
+        print(f'{QUESTION_TEXT} {answer}')
         print('-'*100)
