@@ -24,7 +24,8 @@ def main(args):
                   model=args.model_name,
                   messages=[
                         {"role": "user", "content": example['input_text']},
-                    ]
+                    ],
+                  max_tokens=100
                 )
                 dataset[idx]['prediction'] = response['choices'][0]['message']['content']
             except:
