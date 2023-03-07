@@ -77,11 +77,11 @@ def main(args):
     print(classification_report(y_true=labels, y_pred=predictions, target_names=label_names, zero_division=0, digits=3))
 
 
-parser = argparse.ArgumentParser(description='Prompting GPT')
-parser.add_argument("--dataset_name", type=str, default='unfair_tos', help="Name of dataset as stored on HF")
+parser = argparse.ArgumentParser(description='Evaluate GPT')
+parser.add_argument("--dataset_name", type=str, default='scotus', help="Name of dataset as stored on HF")
 parser.add_argument("--model_name", type=str, default='gpt-3.5-turbo', help="GPT model name")
-parser.add_argument("--multi_label", type=bool, default=True, help="GPT model name")
-parser.add_argument("--few_shot_k", type=int, default=8, help="GPT model name")
+parser.add_argument("--multi_label", type=bool, default=False, help="GPT model name")
+parser.add_argument("--few_shot_k", type=int, default=0, help="GPT model name")
 
 args = parser.parse_args()
 
