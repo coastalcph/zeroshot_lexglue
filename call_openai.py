@@ -35,16 +35,17 @@ def main(args):
             for line in in_file:
                 predictions.append(json.loads(line))
 
+    demonstration_text = ''
+    if args.few_shot_k:
+        random_labels = random.sample(list(label_wise_dataset.keys()), k=args.few_shot_k)
+        demos = [random.sample(label_wise_dataset[label], k=1)[0] for label in random_labels]
+        demonstration_text = '\n\n'.join(demos) + '\n\n'
+
     for idx, example in tqdm.tqdm(enumerate(dataset)):
         if len(predictions) and predictions[idx]['prediction'] is not None:
             dataset[idx]['prediction'] = predictions[idx]['prediction']
             print(f'Predictions for example #{idx} is already available!')
             continue
-        demonstration_text = ''
-        if args.few_shot_k:
-            random_labels = random.sample(list(label_wise_dataset.keys()), k=args.few_shot_k)
-            demos = [random.sample(label_wise_dataset[label], k=1)[0] for label in random_labels]
-            demonstration_text = '\n\n'.join(demos) + '\n\n'
         if args.model_name == 'gpt-3.5-turbo':
             try:
                 response = openai.ChatCompletion.create(
