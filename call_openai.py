@@ -17,7 +17,17 @@ def main(args):
         for line in in_file:
             dataset.append(json.loads(line))
 
+    predictions = []
+    if os.path.exists(os.path.join(DATA_DIR, f'{args.dataset_name}_{args.model_name}_predictions.jsonl')):
+        with open(os.path.join(DATA_DIR, f'{args.dataset_name}_{args.model_name}_predictions.jsonl')) as in_file:
+            for line in in_file:
+                predictions.append(json.loads(line))
+
     for idx, example in tqdm.tqdm(enumerate(dataset)):
+        if predictions[idx]['prediction'] is not None:
+            dataset[idx]['prediction'] = predictions[idx]['prediction']
+            print(f'Predictions for example #{idx} is already available!')
+            continue
         if args.model_name == 'gpt-3.5-turbo':
             try:
                 response = openai.ChatCompletion.create(
