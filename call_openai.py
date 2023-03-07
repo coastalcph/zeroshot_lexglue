@@ -1,24 +1,36 @@
 import json
 import os.path
+import random
 
 import openai
 import tqdm
 import argparse
 from data import DATA_DIR
-
+from build_instructions.templates import TEMPLATES
+random.seed(42)
 
 def main(args):
     # Provide OpenAI API key
     api_key = input("Please provide an OpenAI API key:\n")
     openai.api_key = api_key
-
+    OPTIONS_PRESENTATION_TEXT = TEMPLATES[args.dataset_name]['OPTIONS_PRESENTATION_TEXT']
+    QUESTION_TEXT = TEMPLATES[args.dataset_name]['QUESTION_TEXT']
     dataset = []
+    label_wise_dataset = {}
     with open(os.path.join(DATA_DIR, f'{args.dataset_name}.jsonl')) as in_file:
         for line in in_file:
-            dataset.append(json.loads(line))
+            sample_data = json.loads(line)
+            dataset.append(sample_data)
+            for label in sample_data['answer'].split(','):
+                if label in label_wise_dataset:
+                    label_wise_dataset[label.lower().strip()].append(sample_data['input_text'].split(OPTIONS_PRESENTATION_TEXT)[0]
+                                                             + QUESTION_TEXT + ' ' + sample_data['answer'])
+                else:
+                    label_wise_dataset[label.lower().strip()] = [sample_data['input_text'].split(OPTIONS_PRESENTATION_TEXT)[0]
+                                                         + QUESTION_TEXT + ' ' + sample_data['answer']]
 
     predictions = []
-    if os.path.exists(os.path.join(DATA_DIR, f'{args.dataset_name}_{args.model_name}_predictions.jsonl')):
+    if not args.few_shot_k and os.path.exists(os.path.join(DATA_DIR, f'{args.dataset_name}_{args.model_name}_predictions.jsonl')):
         with open(os.path.join(DATA_DIR, f'{args.dataset_name}_{args.model_name}_predictions.jsonl')) as in_file:
             for line in in_file:
                 predictions.append(json.loads(line))
@@ -28,12 +40,17 @@ def main(args):
             dataset[idx]['prediction'] = predictions[idx]['prediction']
             print(f'Predictions for example #{idx} is already available!')
             continue
+        demonstration_text = ''
+        if args.few_shot_k:
+            random_labels = random.sample(list(label_wise_dataset.keys()), k=args.few_shot_k)
+            demos = [random.sample(label_wise_dataset[label], k=1)[0] for label in random_labels]
+            demonstration_text = '\n\n'.join(demos) + '\n\n'
         if args.model_name == 'gpt-3.5-turbo':
             try:
                 response = openai.ChatCompletion.create(
                   model=args.model_name,
                   messages=[
-                        {"role": "user", "content": example['input_text']},
+                        {"role": "user", "content": demonstration_text + example['input_text']},
                     ],
                   max_tokens=100
                 )
@@ -44,20 +61,23 @@ def main(args):
             try:
                 response = openai.Completion.create(
                   model="gpt-3.5",
-                  prompt=example['input_text'] + " The answer is: "
+                  prompt=demonstration_text + example['input_text']
                 )
                 dataset[idx]['prediction'] = response['choices'][0]['message']['content']
             except:
                 dataset[idx]['prediction'] = None
 
-    with open(os.path.join(DATA_DIR, f'{args.dataset_name}_{args.model_name}_predictions.jsonl'), 'w') as file:
+    name_extension = f'_few_shot-{args.few_shot_k}' if args.few_shot_k else ''
+    with open(os.path.join(DATA_DIR, f'{args.dataset_name}_{args.model_name}_predictions{name_extension}.jsonl'), 'w') as file:
         for example in dataset:
             file.write(json.dumps(example) + '\n')
 
 
 parser = argparse.ArgumentParser(description='Prompting GPT')
-parser.add_argument("--dataset_name", type=str, default='ledgar', help="Name of dataset as stored on HF")
+parser.add_argument("--dataset_name", type=str, default='unfair_tos', help="Name of dataset as stored on HF")
 parser.add_argument("--model_name", type=str, default='gpt-3.5-turbo', help="GPT model name")
+parser.add_argument("--few_shot_k", type=int, default=8, help="GPT model name")
+
 args = parser.parse_args()
 
 main(args)

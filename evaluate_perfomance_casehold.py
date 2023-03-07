@@ -23,18 +23,18 @@ def main(args):
             for l_idx, label_name in enumerate(example['choices']):
                 if label_name.lower() in dataset[idx]['answer'].lower():
                     labels.append(l_idx)
-                    continue
+                    break
             for l_idx, label_name in enumerate(example['choices']):
                 if label_name.lower() in example['prediction'].lower():
                     predictions.append(l_idx)
-                    continue
+                    break
             if len(labels) != len(predictions):
                 predictions.append(random.choice([0, 1, 2]))
         else:
             nones += 1
 
     print(f'{nones} question unanswered!\n')
-    print(classification_report(y_true=labels, y_pred=predictions, target_names=['Choice 1', 'Choice 2', 'Choice 3'],
+    print(classification_report(y_true=labels, y_pred=predictions, target_names=[f'Choice {idx}' for idx in range(5)],
                                 zero_division=0, digits=3))
 
 
