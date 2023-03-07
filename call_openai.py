@@ -23,11 +23,11 @@ def main(args):
             dataset.append(sample_data)
             for label in sample_data['answer'].split(','):
                 if label in label_wise_dataset:
-                    label_wise_dataset[label.lower().strip()].append(sample_data['input_text'].split(OPTIONS_PRESENTATION_TEXT)[0]
-                                                             + QUESTION_TEXT + ' ' + sample_data['answer'])
+                    label_wise_dataset[label.lower().strip()].append(' '.join(sample_data['input_text'].split(OPTIONS_PRESENTATION_TEXT)[0].split(' ')[:args.truncate_demonstrations])
+                                                                     + QUESTION_TEXT + ' ' + sample_data['answer'])
                 else:
-                    label_wise_dataset[label.lower().strip()] = [sample_data['input_text'].split(OPTIONS_PRESENTATION_TEXT)[0]
-                                                         + QUESTION_TEXT + ' ' + sample_data['answer']]
+                    label_wise_dataset[label.lower().strip()] = [' '.join(sample_data['input_text'].split(OPTIONS_PRESENTATION_TEXT)[0].split(' ')[:args.truncate_demonstrations])
+                                                                 + QUESTION_TEXT + ' ' + sample_data['answer']]
 
     predictions = []
     if not args.few_shot_k and os.path.exists(os.path.join(DATA_DIR, f'{args.dataset_name}_{args.model_name}_predictions.jsonl')):
@@ -78,6 +78,8 @@ parser = argparse.ArgumentParser(description='Prompting GPT')
 parser.add_argument("--dataset_name", type=str, default='unfair_tos', help="Name of dataset as stored on HF")
 parser.add_argument("--model_name", type=str, default='gpt-3.5-turbo', help="GPT model name")
 parser.add_argument("--few_shot_k", type=int, default=8, help="GPT model name")
+parser.add_argument("--truncate_demonstrations", type=int, default=350, help="GPT model name")
+
 
 args = parser.parse_args()
 

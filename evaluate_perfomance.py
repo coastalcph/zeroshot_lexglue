@@ -55,7 +55,8 @@ def main(args):
                        enumerate(predict_dataset.features['label'].names)]
 
     dataset = []
-    with open(os.path.join(DATA_DIR, f'{args.dataset_name}_{args.model_name}_predictions.jsonl')) as file:
+    name_extension = f'_few_shot-{args.few_shot_k}' if args.few_shot_k else ''
+    with open(os.path.join(DATA_DIR, f'{args.dataset_name}_{args.model_name}_predictions{name_extension}.jsonl')) as file:
         for line in file:
             dataset.append(json.loads(line))
 
@@ -77,9 +78,10 @@ def main(args):
 
 
 parser = argparse.ArgumentParser(description='Prompting GPT')
-parser.add_argument("--dataset_name", type=str, default='ledgar', help="Name of dataset as stored on HF")
+parser.add_argument("--dataset_name", type=str, default='unfair_tos', help="Name of dataset as stored on HF")
 parser.add_argument("--model_name", type=str, default='gpt-3.5-turbo', help="GPT model name")
-parser.add_argument("--multi_label", type=bool, default=False, help="GPT model name")
+parser.add_argument("--multi_label", type=bool, default=True, help="GPT model name")
+parser.add_argument("--few_shot_k", type=int, default=8, help="GPT model name")
 
 args = parser.parse_args()
 
