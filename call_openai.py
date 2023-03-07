@@ -57,7 +57,8 @@ def main(args):
                   max_tokens=100
                 )
                 dataset[idx]['prediction'] = response['choices'][0]['message']['content']
-            except:
+            except Exception as inst:
+                print(inst)
                 dataset[idx]['prediction'] = None
         else:
             try:

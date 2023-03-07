@@ -17,7 +17,7 @@ random_ids = random.sample(range(len(predict_dataset)), k=1000)
 predict_dataset = predict_dataset.select(random_ids)
 
 # Compute templated text tokens
-templated_text = TEMPLATES['scotus']['INPUT_INTRODUCTORY_TEXT'] + '\n" "\n'
+templated_text = TEMPLATES['scotus']['INPUT_INTRODUCTORY_TEXT'] + '\n" "\n\n'
 templated_text += TEMPLATES['scotus']['OPTIONS_PRESENTATION_TEXT']
 for end_idx, label_name in enumerate(label_names):
     templated_text += f'- {label_name}\n'
@@ -31,7 +31,7 @@ with open(os.path.join(DATA_DIR, 'scotus.jsonl'), 'w') as file:
     for idx, sample in enumerate(predict_dataset):
         text = sample["text"]
         words = text.split(' ')
-        for threshold in [4000, 3800, 3600, 3400, 3200, 3000]:
+        for threshold in [4000, 3800, 3600, 3400, 3200, 3000, 2800, 2600, 2400, 2000]:
             shortened_text = ' '.join(text.split(' ')[:threshold])
             input_text_length = len(tokenizer.encode(shortened_text))
             if templated_text_length + input_text_length <= 4000:
