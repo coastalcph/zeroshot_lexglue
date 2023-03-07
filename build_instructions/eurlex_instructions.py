@@ -62,7 +62,7 @@ with open(os.path.join(DATA_DIR, 'eurlex.jsonl'), 'w') as file:
             input_text_length = len(tokenizer.encode(shortened_text))
             if templated_text_length + input_text_length <= 4000:
                 break
-        text_input = TEMPLATES['eurlex']['INPUT_INTRODUCTORY_TEXT'] + f'"{text}"\n\n'
+        text_input = TEMPLATES['eurlex']['INPUT_INTRODUCTORY_TEXT'] + f'"{shortened_text}"\n\n'
         text_input += TEMPLATES['eurlex']['OPTIONS_PRESENTATION_TEXT']
         for end_idx, label_name in enumerate(label_names):
             text_input += f'- {label_name}\n'

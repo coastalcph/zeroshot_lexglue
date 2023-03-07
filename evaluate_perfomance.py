@@ -39,6 +39,9 @@ EUROVOC_CONCEPTS = ['political framework', 'politics and public safety', 'execut
                     'America', 'Africa', 'Asia and Oceania', 'economic geography', 'political geography',
                     'overseas countries and territories', 'United Nations']
 
+SCOTUS_AREAS = ['Criminal Procedure', 'Civil Rights', 'First Amendment', 'Due Process', 'Privacy', 'Attorneys',
+                'Unions', 'Economic Activity', 'Judicial Power', 'Federalism', 'Interstate Relations',
+                'Federal Taxation', 'Miscellaneous']
 
 def main(args):
     predict_dataset = load_dataset("lexlms/lex_glue_v2", args.dataset_name, split="test",
@@ -49,10 +52,13 @@ def main(args):
             label_names = [f'{label_name}'.lower() for idx, label_name in
                            enumerate(predict_dataset.features['labels'].feature.names)] + ['none']
         else:
-            label_names = EUROVOC_CONCEPTS
+            label_names = [label.lower() for label in EUROVOC_CONCEPTS]
     else:
-        label_names = [f'{label_name}'.lower() for idx, label_name in
-                       enumerate(predict_dataset.features['label'].names)]
+        if args.dataset_name != 'scotus':
+            label_names = [f'{label_name}'.lower() for idx, label_name in
+                           enumerate(predict_dataset.features['label'].names)]
+        else:
+            label_names = [label.lower() for label in SCOTUS_AREAS]
 
     dataset = []
     name_extension = f'_few_shot-{args.few_shot_k}' if args.few_shot_k else ''

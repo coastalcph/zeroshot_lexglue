@@ -78,10 +78,10 @@ def main(args):
 
 
 parser = argparse.ArgumentParser(description='Prompting GPT')
-parser.add_argument("--dataset_name", type=str, default='scotus', help="Name of dataset as stored on HF")
+parser.add_argument("--dataset_name", type=str, default='eurlex', help="Name of dataset as stored on HF")
 parser.add_argument("--model_name", type=str, default='gpt-3.5-turbo', help="GPT model name")
-parser.add_argument("--few_shot_k", type=int, default=0, help="GPT model name")
-parser.add_argument("--truncate_demonstrations", type=int, default=350, help="GPT model name")
+parser.add_argument("--few_shot_k", type=int, default=8, help="GPT model name")
+parser.add_argument("--truncate_demonstrations", type=int, default=300, help="GPT model name")
 
 
 args = parser.parse_args()
