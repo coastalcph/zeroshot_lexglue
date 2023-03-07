@@ -4,7 +4,9 @@ from data import DATA_DIR
 from datasets import load_dataset
 import random
 import tiktoken
+from templates import TEMPLATES
 
+# Load test dataset and labels
 predict_dataset = load_dataset("lexlms/lex_glue_v2", 'eurlex', split="test",
                                use_auth_token='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')
 label_names = predict_dataset.features['labels'].feature.names
@@ -39,20 +41,18 @@ random.seed(42)
 random_ids = random.sample(range(len(predict_dataset)), k=1000)
 predict_dataset = predict_dataset.select(random_ids)
 
-# Prompt templated text
-INPUT_INTRODUCTORY_TEXT = f'Given the following excerpt from an EU law:'
-OPTIONS_PRESENTATION_TEXT = 'The EU law is relevant to some topics out of the following options:\n'
-QUESTION_TEXT = 'The relevant options are:'
 
-templated_text = INPUT_INTRODUCTORY_TEXT + '\n" "\n'
-templated_text += OPTIONS_PRESENTATION_TEXT
+# Compute templated text tokens
+templated_text = TEMPLATES['eurlex']['INPUT_INTRODUCTORY_TEXT'] + '\n" "\n'
+templated_text += TEMPLATES['eurlex']['OPTIONS_PRESENTATION_TEXT']
 for end_idx, label_name in enumerate(label_names):
     templated_text += f'- {label_name}\n'
-templated_text += QUESTION_TEXT
+templated_text += TEMPLATES['eurlex']['QUESTION_TEXT']
 
 tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
 templated_text_length = len(tokenizer.encode(templated_text))
 
+total_input = ''
 with open(os.path.join(DATA_DIR, 'eurlex.jsonl'), 'w') as file:
     for idx, sample in enumerate(predict_dataset):
         text = sample["text"]
@@ -62,13 +62,24 @@ with open(os.path.join(DATA_DIR, 'eurlex.jsonl'), 'w') as file:
             input_text_length = len(tokenizer.encode(shortened_text))
             if templated_text_length + input_text_length <= 4000:
                 break
-        text_input = INPUT_INTRODUCTORY_TEXT + f'\n"{text}"\n\n'
-        text_input += OPTIONS_PRESENTATION_TEXT
+        text_input = TEMPLATES['eurlex']['INPUT_INTRODUCTORY_TEXT'] + f'"{text}"\n\n'
+        text_input += TEMPLATES['eurlex']['OPTIONS_PRESENTATION_TEXT']
         for end_idx, label_name in enumerate(label_names):
             text_input += f'- {label_name}\n'
-        text_input += QUESTION_TEXT
+        text_input += TEMPLATES['eurlex']['QUESTION_TEXT']
         print(text_input)
         answer = ", ".join([label_names[label] for idx, label in sorted(enumerate(sample['labels']))])
         file.write(json.dumps({'input_text': text_input, 'answer': answer}) + '\n')
-        print(f'{QUESTION_TEXT} {answer}')
+        print(f"{TEMPLATES['eurlex']['QUESTION_TEXT']} {answer}")
         print('-' * 100)
+        total_input += text_input
+
+
+# Count tokens and cost
+tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
+total_n_tokens = len(tokenizer.encode(total_input)) + 100 * 1000
+print(f'The total number of tokens is {total_n_tokens}, with an '
+      f'estimated processing cost of {total_n_tokens * (0.002/1000):.2f}$.')
+
+
+
