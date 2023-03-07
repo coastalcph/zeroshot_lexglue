@@ -16,12 +16,12 @@ def main(args):
     OPTIONS_PRESENTATION_TEXT = TEMPLATES[args.dataset_name]['OPTIONS_PRESENTATION_TEXT']
     QUESTION_TEXT = TEMPLATES[args.dataset_name]['QUESTION_TEXT']
     dataset = []
-    if args.few_shot_k:
-        label_wise_dataset = {}
-        with open(os.path.join(DATA_DIR, f'{args.dataset_name}.jsonl')) as in_file:
-            for line in in_file:
-                sample_data = json.loads(line)
-                dataset.append(sample_data)
+    label_wise_dataset = {}
+    with open(os.path.join(DATA_DIR, f'{args.dataset_name}.jsonl')) as in_file:
+        for line in in_file:
+            sample_data = json.loads(line)
+            dataset.append(sample_data)
+            if args.few_shot_k:
                 for label in sample_data['answer'].split(','):
                     if label in label_wise_dataset:
                         label_wise_dataset[label.lower().strip()].append(' '.join(sample_data['input_text'].split(OPTIONS_PRESENTATION_TEXT)[0].split(' ')[:args.truncate_demonstrations])
