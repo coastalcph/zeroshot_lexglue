@@ -34,7 +34,7 @@ with open(os.path.join(DATA_DIR, 'scotus.jsonl'), 'w') as file:
         for threshold in [4000, 3800, 3600, 3400, 3200, 3000, 2800, 2600, 2400, 2000]:
             shortened_text = ' '.join(text.split(' ')[:threshold])
             input_text_length = len(tokenizer.encode(shortened_text))
-            if templated_text_length + input_text_length <= 4000:
+            if templated_text_length + input_text_length <= 3900:
                 break
         text_input = TEMPLATES['scotus']['INPUT_INTRODUCTORY_TEXT'] + f'\n"{shortened_text}"\n\n'
         text_input += 'Which topics are relevant out of the following options:\n'
