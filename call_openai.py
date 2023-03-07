@@ -24,7 +24,7 @@ def main(args):
                 predictions.append(json.loads(line))
 
     for idx, example in tqdm.tqdm(enumerate(dataset)):
-        if predictions[idx]['prediction'] is not None:
+        if len(predictions) and predictions[idx]['prediction'] is not None:
             dataset[idx]['prediction'] = predictions[idx]['prediction']
             print(f'Predictions for example #{idx} is already available!')
             continue
