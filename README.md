@@ -7,7 +7,7 @@ Following the work ["GPT Takes the Bar Exam"](https://arxiv.org/abs/2212.14402) 
 If you mention or build on top of this work, please cite:
 ```
 @article{chalkidis-2023-lexglue-chatgpt,
-  title={ChatGPT may pass the Legal Bar Exams soon, but sucks in LexGLUE},
+  title={ChatGPT may Pass the Bar Exam soon, but has a Long Way to Go for the LexGLUE benchmark},
   author={Ilias Chalkidis},
   journal={arXiv:xxxx.xxxx},
   year={2023},
