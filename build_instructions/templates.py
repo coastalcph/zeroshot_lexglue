@@ -7,6 +7,10 @@ TEMPLATES = {'ecthr_a':
                  {'INPUT_INTRODUCTORY_TEXT': 'Given the following facts from a European Court of Human Rights (ECtHR) case:',
                   'OPTIONS_PRESENTATION_TEXT': 'Which article(s) of ECHR are relevant, if any, out of the following options:\n',
                   'QUESTION_TEXT': 'The relevant options are:'},
+             'ecthr_b_v2':
+                 {'INPUT_INTRODUCTORY_TEXT': 'Given the following facts from a European Court of Human Rights (ECtHR) opinion:',
+                   'OPTIONS_PRESENTATION_TEXT': 'Which article(s) of the European Convention of Human Rights (ECHR) were considered in court, if any, out of the following options:\n',
+                   'QUESTION_TEXT': 'The articles considered are:'},
              'scotus':
                  {'INPUT_INTRODUCTORY_TEXT': 'Given the following opinion from the Supreme Court of USA (SCOTUS):',
                   'OPTIONS_PRESENTATION_TEXT': 'Which topics are relevant out of the following options:\n',

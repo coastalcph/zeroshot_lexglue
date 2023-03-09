@@ -15,7 +15,7 @@ random_ids = random.sample(range(len(predict_dataset)), k=1000)
 predict_dataset = predict_dataset.select(random_ids)
 
 total_input = ''
-with open(os.path.join(DATA_DIR, 'ledgar.jsonl'), 'w') as file:
+with open(os.path.join(DATA_DIR, 'instruction-following-examples', 'ledgar.jsonl'), 'w') as file:
     for idx, sample in enumerate(predict_dataset):
         text = sample["text"].replace(' ,', ',').replace(' .', '.').replace('\n', ' ').replace('`` ', '\'').replace(' \'\'', '\'').strip()
         text_input = TEMPLATES['ledgar']['INPUT_INTRODUCTORY_TEXT'] + f'"{text}"\n\n'

@@ -1,10 +1,14 @@
 import json
+import re
+
 import numpy as np
 import os
 from sklearn.metrics import classification_report
 from datasets import load_dataset
 from data import DATA_DIR
 import argparse
+from sentence_transformers import SentenceTransformer, util
+model = SentenceTransformer('all-MiniLM-L6-v2')
 
 EUROVOC_CONCEPTS = ['political framework', 'politics and public safety', 'executive power and public service',
                     'international affairs', 'cooperation policy', 'international security', 'defence',
@@ -52,7 +56,7 @@ def main(args):
             label_names = [f'{label_name}'.lower() for idx, label_name in
                            enumerate(predict_dataset.features['labels'].feature.names)] + ['none']
         else:
-            label_names = [label.lower() for label in EUROVOC_CONCEPTS]
+            label_names = ['Article ' + label.lower() for label in EUROVOC_CONCEPTS]
     else:
         if args.dataset_name != 'scotus':
             label_names = [f'{label_name}'.lower() for idx, label_name in
@@ -60,12 +64,15 @@ def main(args):
         else:
             label_names = [label.lower() for label in SCOTUS_AREAS]
 
+    label_embeddings = [model.encode(label) for label in label_names]
     dataset = []
     name_extension = f'_few_shot-{args.few_shot_k}' if args.few_shot_k else ''
-    with open(os.path.join(DATA_DIR, f'{args.dataset_name}_{args.model_name}_predictions{name_extension}.jsonl')) as file:
+    folder_name = f'_few_shot-predictions' if args.few_shot_k else 'zero-shot-predictions'
+    with open(os.path.join(DATA_DIR, folder_name, f'{args.dataset_name}_{args.model_name}_predictions{name_extension}.jsonl')) as file:
         for line in file:
             dataset.append(json.loads(line))
 
+    noisy_labels = 0
     labels = np.zeros((len(dataset), len(label_names)))
     predictions = np.zeros((len(dataset), len(label_names)))
     nones = 0
@@ -76,18 +83,31 @@ def main(args):
                     labels[idx][l_idx] = 1
                 if label_name in example['prediction'].lower():
                     predictions[idx][l_idx] = 1
+            if sum(predictions[idx]) == 0:
+                if args.multi_label:
+                    preds = [pred.strip('.').strip(' ').strip('\n') for pred in re.split('[\n,]', example['prediction'].lower())]
+                else:
+                    preds = [example['prediction'].lower()]
+                for pred in preds:
+                    if len(pred) >= 3:
+                        pred_embeddings = model.encode(pred)
+                        label_id = util.cos_sim(pred_embeddings, label_embeddings).argmax().numpy()
+                        predictions[idx][label_id] = 1
+                        print(f'Prediction "{pred}" best matches label "{dataset[idx]["answer"].lower()}"')
+                noisy_labels += 1
         else:
             nones += 1
 
     print(f'{nones} question unanswered!\n')
+    print(f'{noisy_labels} noisy answers!\n')
     print(classification_report(y_true=labels, y_pred=predictions, target_names=label_names, zero_division=0, digits=3))
 
 
 parser = argparse.ArgumentParser(description='Evaluate GPT')
-parser.add_argument("--dataset_name", type=str, default='scotus', help="Name of dataset as stored on HF")
+parser.add_argument("--dataset_name", type=str, default='ecthr_b', help="Name of dataset as stored on HF")
 parser.add_argument("--model_name", type=str, default='gpt-3.5-turbo', help="GPT model name")
-parser.add_argument("--multi_label", type=bool, default=False, help="GPT model name")
-parser.add_argument("--few_shot_k", type=int, default=0, help="GPT model name")
+parser.add_argument("--multi_label", type=bool, default=True, help="Whether the task is multi-label")
+parser.add_argument("--few_shot_k", type=int, default=0, help="Number of k-shots")
 
 args = parser.parse_args()
 

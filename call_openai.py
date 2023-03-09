@@ -72,16 +72,17 @@ def main(args):
                 dataset[idx]['prediction'] = None
 
     name_extension = f'_few_shot-{args.few_shot_k}' if args.few_shot_k else ''
-    with open(os.path.join(DATA_DIR, f'{args.dataset_name}_{args.model_name}_predictions{name_extension}.jsonl'), 'w') as file:
+    folder_name = f'_few_shot-predictions' if args.few_shot_k else 'zero-shot-predictions'
+    with open(os.path.join(DATA_DIR, folder_name, f'{args.dataset_name}_{args.model_name}_predictions{name_extension}.jsonl'), 'w') as file:
         for example in dataset:
             file.write(json.dumps(example) + '\n')
 
 
 parser = argparse.ArgumentParser(description='Prompting GPT')
-parser.add_argument("--dataset_name", type=str, default='eurlex', help="Name of dataset as stored on HF")
+parser.add_argument("--dataset_name", type=str, default='ledgar', help="Name of dataset as stored on HF")
 parser.add_argument("--model_name", type=str, default='gpt-3.5-turbo', help="GPT model name")
-parser.add_argument("--few_shot_k", type=int, default=8, help="GPT model name")
-parser.add_argument("--truncate_demonstrations", type=int, default=300, help="GPT model name")
+parser.add_argument("--few_shot_k", type=int, default=8, help="Number of k-shots")
+parser.add_argument("--truncate_demonstrations", type=int, default=100, help="Truncation of demonstrations")
 
 
 args = parser.parse_args()

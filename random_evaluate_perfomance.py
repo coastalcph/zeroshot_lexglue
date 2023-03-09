@@ -19,6 +19,24 @@ def main(args):
     else:
         label_names = [f'{label_name}'.lower() for idx, label_name in
                        enumerate(predict_dataset.features['label'].names)]
+
+    if args.train_bias:
+        train_dataset = load_dataset("lexlms/lex_glue_v2", args.dataset_name, split="train",
+                                       use_auth_token='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')
+        weights = np.zeros(len(label_names))
+        for _, example in enumerate(train_dataset):
+            for l_idx, label_name in enumerate(label_names):
+                if args.multi_label and l_idx in example['labels']:
+                    weights[l_idx] += 1
+                elif not args.multi_label and l_idx == example['label']:
+                    weights[l_idx] += 1
+            if 'none' in label_names and len(example['labels']) == 0:
+                weights[-1] += 1
+
+        weights /= len(train_dataset)
+    else:
+        weights = np.ones(len(label_names))
+
     random.seed(42)
     random_ids = random.sample(range(len(predict_dataset)), k=1000)
     predict_dataset = predict_dataset.select(random_ids)
@@ -32,19 +50,20 @@ def main(args):
             elif not args.multi_label and l_idx == example['label']:
                 labels[idx][l_idx] = 1
         if args.multi_label:
-            random_ids = random.sample(range(len(label_names)), 5)
+            random_ids = random.choices(range(len(label_names)), k=5, weights=weights)
             for random_idx in random_ids:
                 predictions[idx][random_idx] = 1
         else:
-            random_idx = random.choice(range(len(label_names)))
+            random_idx = random.choices(range(len(label_names)), k=1, weights=weights)
             predictions[idx][random_idx] = 1
 
     print(classification_report(y_true=labels, y_pred=predictions, target_names=label_names, zero_division=0, digits=3))
 
 
 parser = argparse.ArgumentParser(description='Prompting GPT')
-parser.add_argument("--dataset_name", type=str, default='case_hold', help="Name of dataset as stored on HF")
-parser.add_argument("--multi_label", type=bool, default=False, help="GPT model name")
+parser.add_argument("--dataset_name", type=str, default='unfair_tos', help="Name of dataset as stored on HF")
+parser.add_argument("--multi_label", type=bool, default=True, help="Whether the task is multi-label")
+parser.add_argument("--train_bias", type=bool, default=True, help="Whether to use training distribution bias")
 
 args = parser.parse_args()
 

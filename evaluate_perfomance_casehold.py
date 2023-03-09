@@ -7,17 +7,19 @@ from sklearn.metrics import classification_report
 from datasets import load_dataset
 from data import DATA_DIR
 import argparse
-
+from sentence_transformers import SentenceTransformer, util
+model = SentenceTransformer('all-MiniLM-L6-v2')
 
 def main(args):
     dataset = []
-    with open(os.path.join(DATA_DIR, f'case_hold_{args.model_name}_predictions.jsonl')) as file:
+    with open(os.path.join(DATA_DIR, 'zero-shot-predictions', f'case_hold_{args.model_name}_predictions.jsonl')) as file:
         for line in file:
             dataset.append(json.loads(line))
 
     labels = []
     predictions = []
     nones = 0
+    noisy_labels = 0
     for idx, example in enumerate(dataset):
         if example['prediction'] is not None:
             for l_idx, label_name in enumerate(example['choices']):
@@ -29,7 +31,13 @@ def main(args):
                     predictions.append(l_idx)
                     break
             if len(labels) != len(predictions):
-                predictions.append(random.choice([0, 1, 2]))
+                prediction = example['prediction'].lower()
+                pred_embeddings = model.encode(prediction)
+                label_embeddings = model.encode(example['choices'])
+                label_id = util.cos_sim(pred_embeddings, label_embeddings).argmax().numpy()
+                predictions.append(label_id)
+                print(f'- Prediction "{prediction}" best matches label "{dataset[idx]["answer"].lower()}"')
+                noisy_labels += 1
         else:
             nones += 1
 

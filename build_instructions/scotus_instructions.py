@@ -27,7 +27,7 @@ tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
 templated_text_length = len(tokenizer.encode(templated_text))
 
 total_input = ''
-with open(os.path.join(DATA_DIR, 'scotus.jsonl'), 'w') as file:
+with open(os.path.join(DATA_DIR, 'instruction-following-examples', 'scotus.jsonl'), 'w') as file:
     for idx, sample in enumerate(predict_dataset):
         text = sample["text"]
         words = text.split(' ')

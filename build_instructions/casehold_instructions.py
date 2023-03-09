@@ -14,7 +14,7 @@ random_ids = random.sample(range(len(predict_dataset)), k=1000)
 predict_dataset = predict_dataset.select(random_ids)
 
 total_input = ''
-with open(os.path.join(DATA_DIR, 'case_hold.jsonl'), 'w') as file:
+with open(os.path.join(DATA_DIR, 'instruction-following-examples', 'case_hold.jsonl'), 'w') as file:
     for idx, sample in enumerate(predict_dataset):
         text_input = TEMPLATES['case_hold']['INPUT_INTRODUCTORY_TEXT'] + f'\n"{sample["contexts"][0].replace("<HOLDING>", "[Masked Holding]")}"\n\n'
         text_input += TEMPLATES['case_hold']['OPTIONS_PRESENTATION_TEXT']
