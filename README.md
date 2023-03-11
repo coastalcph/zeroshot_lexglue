@@ -2,14 +2,15 @@
 
 This project is related to the pre-print paper: ["ChatGPT may Pass the Bar Exam soon, but has a Long Way to Go for the LexGLUE benchmark"](http://) by Chalkidis (2023). 
 
-Following the work ["GPT Takes the Bar Exam"](https://arxiv.org/abs/2212.14402) of Bommarito II and Katz (2023), we evaluate the latest OpenAI's GPT-3.5 model `gpt-3.5-turbo`, (v. March 2023), the first available ChatGPT, on legal text classification tasks from the LexGLUE benchmark in a zero-shot fashion providing examples in a templated instruction-following format, similar to those used by  ["Scaling Instruction-Finetuned Language Models"](https://arxiv.org/abs/2210.11416) (Chung et al., 2022)..  We find that ChatGPT achieves an average micro-F1 score of 49.0% across LexGLUE tasks in a zero-shot setting, significantly in excess of the baseline guessing rates, while the model performs exceptionally well in some datasets achieving micro-F1 scores of 62.8% and 70.1% in the ECtHR B and LEDGAR datasets.
+Following the work ["GPT Takes the Bar Exam"](https://arxiv.org/abs/2212.14402) of Bommarito and Katz (2023), we evaluate the latest OpenAI's GPT-3.5 model `gpt-3.5-turbo`, (v. March 2023), the first available ChatGPT, on legal text classification tasks from the LexGLUE benchmark in a zero-shot fashion providing examples in a templated instruction-following format, similar to those used by  ["Scaling Instruction-Finetuned Language Models"](https://arxiv.org/abs/2210.11416) (Chung et al., 2022).  We find that ChatGPT achieves an average micro-F1 score of 49.0% across LexGLUE tasks in a zero-shot setting, significantly in excess of the baseline guessing rates, while the model performs exceptionally well in some datasets achieving micro-F1 scores of 62.8% and 70.1% in the ECtHR B and LEDGAR datasets.
 
 If you mention or build on top of this work, please cite:
 ```
 @article{chalkidis-2023-lexglue-chatgpt,
   title={ChatGPT may Pass the Bar Exam soon, but has a Long Way to Go for the LexGLUE benchmark},
   author={Ilias Chalkidis},
-  journal={arXiv:xxxx.xxxx},
+  journal={SSRN},
+  url={https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4385460},
   year={2023},
 }
 ```
@@ -122,13 +123,13 @@ python evaluate_perfomance.py --dataset_name eurlex --model_name gpt-3.5-turbo -
 
 | Dataset Name   | Usage Cost | 
 |----------------|------------|
- | **ECtHR A**    | $4.43      |
- | **ECtHR B**    | $4.43      | 
- | **SCOTUS**     | $8.49      | 
- | **EURLEX**     | $6.15      | 
- | **LEDGAR**     | $1.34      | 
- | **UNFAIR-ToS** | $0.41      | 
- | **CASEHOLD**   | $0.99      | 
+| **ECtHR A**    | $4.43      |
+| **ECtHR B**    | $4.43      | 
+| **SCOTUS**     | $8.49      | 
+| **EURLEX**     | $6.15      | 
+| **LEDGAR**     | $1.34      | 
+| **UNFAIR-ToS** | $0.41      | 
+| **CASEHOLD**   | $0.99      | 
 | **Total**      | $26.24     |
 
 
